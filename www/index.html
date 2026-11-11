@@ -441,7 +441,7 @@ input:disabled{opacity:.4}
     <button class="ditem" data-open="faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg><span data-t="Pitanja">FAQ</span></button>
     <button class="ditem" data-toast="Opens the Google Play rating page in the real app" data-toast-sr="U pravoj aplikaciji otvara ocenjivanje na Google Play-u"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg><span data-t="Oceni aplikaciju">Rate the app</span></button>
     <button class="ditem" data-toast="Opens the share menu in the real app" data-toast-sr="U pravoj aplikaciji otvara meni za deljenje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/></svg><span data-t="Podeli aplikaciju">Share the app</span></button>
-    <div class="dfoot">© 2026 Nan Numero<br><span style="opacity:.8">Design & development: Zorica Kolundžija</span></div>
+    <div class="dfoot" id="dfoot">© 2026 Nan Numero<br><span style="opacity:.8">Design & development: Zorica Kolundžija</span></div>
   </div>
 </div>
 
@@ -1228,6 +1228,16 @@ function initBilling(){
   store.initialize([Platform.GOOGLE_PLAY]).then(()=>applyOwned());
 }
 document.addEventListener("deviceready",initBilling,false);
+
+
+/* ===== Reviewer access (for Google Play app review) =====
+   Tap the drawer footer 7 times, then enter the access code. Only the SHA-256 hash is stored here. */
+const REVIEW_HASH="6e49b99d3df05fac238e30c781f31dacdb729221b3801f041699d8550e24058d";
+let footTaps=0,footTimer=null;
+async function sha256(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+function reviewerSheet(){$("#drawer").classList.remove("on");openSheet(`<h2>${tr("Reviewer access","Pristup za proveru")}</h2><p class="lead">${tr("Enter the access code","Unesite pristupni kod")}</p><div class="field"><input id="revCode" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase"></div><button class="btn gold mt" id="revGo">OK</button>`);
+  $("#revGo").onclick=async()=>{const v=($("#revCode").value||"").trim().toUpperCase();if(await sha256(v)===REVIEW_HASH){state.pro=true;save();render();if(typeof refreshAds==="function")refreshAds();closeSheet();toast(tr("✦ All content unlocked for review","✦ Sav sadržaj otključan za proveru"))}else toast(tr("Wrong code","Pogrešan kod"))}}
+document.addEventListener("click",e=>{if(!e.target.closest("#dfoot"))return;footTaps++;clearTimeout(footTimer);footTimer=setTimeout(()=>footTaps=0,2500);if(footTaps>=7){footTaps=0;reviewerSheet()}});
 
 /* ================= ONBOARDING ================= */
 let onbAdding=false, onbFromStart=false;
