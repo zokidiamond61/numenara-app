@@ -33,6 +33,16 @@ jobs:
           name: Numenara-${{ github.run_number }}
           path: out/
 
+      - name: Publish download links (GitHub Release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "out/Numenara-${{ github.run_number }}.apk" out/Numenara.apk
+          cp "out/Numenara-${{ github.run_number }}.aab" out/Numenara.aab
+          gh release create "v1.0.${{ github.run_number }}" out/Numenara.apk out/Numenara.aab \
+            --title "Numenara 1.0.${{ github.run_number }}" \
+            --notes "Numenara.apk – install on an Android phone for testing. Numenara.aab – upload to Google Play Console." --latest
+
       - name: Save build log on failure
         if: failure()
         run: |
