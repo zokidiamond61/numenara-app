@@ -1,0 +1,8 @@
+{
+  "appId": "com.nannumero.numenara",
+  "appName": "Numenara",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#120a24"
+  }
+}
