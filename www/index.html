@@ -141,9 +141,10 @@ body.native:not(.pro) main{padding-bottom:90px}
 body.pro main{padding-bottom:40px}
 
 /* Sheets & overlays */
-.overlay{position:fixed;inset:0;z-index:90;background:rgba(5,2,12,.7);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center}
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(5,2,12,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top) + 14px) 12px calc(env(safe-area-inset-bottom) + 14px)}
+body:not(.pro) .overlay{padding-bottom:calc(env(safe-area-inset-bottom) + 104px)}
 .overlay.on{display:flex;animation:fade .25s}
-.sheet{width:100%;max-width:440px;max-height:90vh;overflow:auto;border-radius:24px 24px 0 0;padding:22px 20px calc(env(safe-area-inset-bottom) + 26px);
+.sheet{width:100%;max-width:440px;max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:24px;padding:22px 20px 34px;
   background:linear-gradient(180deg,#2a1752,#170c2e);border-top:1px solid var(--line);position:relative}
 .sheet .grab{width:44px;height:4px;border-radius:4px;background:rgba(255,255,255,.2);margin:-8px auto 16px}
 .sheet .close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center}
@@ -862,7 +863,7 @@ function render(){
   const S=SIGNS[r.st.sign];
   const orow=(id,label,sub,val)=>`<button class="row" data-open="${id}"><span class="lbl">${label}<span class="sub">${sub}</span></span><span class="val">${val}</span></button>`;
   $("#dateRows").innerHTML=row("lifePath",r.lp)+row("attitude",r.att)+row("generation",r.gen)+orow("stepen",tr("Degree","Stepen"),tr(`Day ${p.d} · ${S[1]} ${S[0]} influence`,`Dan ${p.d} · uticaj: ${S[1]} ${S[0]}`),r.st.deg)+row("birthday",r.bday)+row("maturity",r.mat);
-  $("#nameRows").innerHTML=orow("bk",tr("Character Number (BK)","Broj karaktera (BK)"),tr(`First + last name · ${chain(r.bk)}`,`Ime + prezime · ${chain(r.bk)}`),r.bkN)+orow("pli",tr("Full Personal Expression (PLI)","Pun lični izraz (PLI)"),tr(`BK + date of birth · ${chain(r.pli)}`,`BK + datum rođenja · ${chain(r.pli)}`),r.pliN)+row("soul",r.soul)+row("personality",r.pers);
+  $("#nameRows").innerHTML=orow("bk",tr("Character Number (BK)","Broj karaktera (BK)"),tr("From your first and last name","Iz imena i prezimena"),r.bkN)+orow("pli",tr("Full Personal Expression (PLI)","Pun lični izraz (PLI)"),tr("Your name and date of birth together","Ime i datum rođenja zajedno"),r.pliN)+row("soul",r.soul)+row("personality",r.pers);
   const lock=(id,label,sub,val)=>has(id)
     ? `<button class="row" data-open="${id}"><span class="lbl">${label}<span class="sub">${sub}</span></span>${val!==undefined?`<span class="val" style="font-size:22px">${val}</span>`:""}</button>`
     : `<button class="row locked" data-lock="${id}"><span class="lbl">${label}<span class="sub">${sub}</span></span>${GEM}</button>`;
@@ -884,11 +885,8 @@ function render(){
   const now=new Date();
   $("#cycDate").textContent=LANG==="sr"?`${now.getDate()}. ${MONTHS[now.getMonth()]} ${now.getFullYear()}.`:`${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
   const sumBlock=(top,add,res,lbl)=>`<div class="sumb"><div class="lbl">${lbl}</div><div class="nums"><span></span><span>${top.join("")}</span><span>+</span><span>${String(add).repeat(3)}</span><span></span><span class="res">${res.join("")}</span></div></div>`;
-  $("#cycTexts").innerHTML=`<div class="card"><p style="line-height:1.6">${tr(`Your cycles are read from your Pythagorean Code <b>${c.code.join("")}</b>. To every digit of the code we add the number of the year, then of the month, then of the day – each digit is reduced to one digit.`,`Ciklusi se čitaju iz vašeg Pitagorinog koda <b>${c.code.join("")}</b>. Na svaku cifru koda dodaje se broj godine, zatim meseca, pa dana – svaka cifra se svodi na jednu.`)}</p>
-   <p class="small mt">${tr("Year","Godina")} ${now.getFullYear()} → ${String(now.getFullYear()).split("").join("+")} = ${c.yn} · ${tr("Month","Mesec")} ${now.getMonth()+1} → ${c.mn} · ${tr("Day","Dan")} ${now.getDate()} → ${c.dn}</p>
-   ${sumBlock(c.code,c.yn,c.yc,tr("your year code","kod godine"))}
-   ${sumBlock(c.yc,c.mn,c.mc,tr("your month code","kod meseca"))}
-   ${sumBlock(c.mc,c.dn,c.dc,tr("your code today","današnji kod"))}
+  $("#cycTexts").innerHTML=`<div class="card"><p style="line-height:1.6">${tr(`Your cycles are read from your Pythagorean Code <b>${c.code.join("")}</b>. They show how the energy of time works with your own numbers.`,`Ciklusi se čitaju iz vašeg Pitagorinog koda <b>${c.code.join("")}</b>. Pokazuju kako energija vremena deluje na vaše lične brojeve.`)}</p>
+   <p class="mt" style="line-height:1.6">${tr("Each year, month and day brings its own energy that meets your personal code. The year code shows the main theme of the year, the month code the tone of the weeks ahead, and today's code the energy of this very day.","Svaka godina, mesec i dan donose svoju energiju koja se susreće sa vašim ličnim kodom. Kod godine pokazuje glavnu temu godine, kod meseca ton narednih nedelja, a današnji kod energiju upravo ovog dana.")}</p>
    <h3 class="serif" style="color:var(--gold2);font-size:21px;margin-top:14px">${tr("This Year","Ova godina")} · ${c.py}</h3><p style="line-height:1.6;margin-top:4px">${YEAR[c.yc[2]]}</p>
    <h3 class="serif" style="color:var(--gold2);font-size:21px;margin-top:14px">${tr("This Month","Ovaj mesec")} · ${c.pm}</h3><p style="line-height:1.6;margin-top:4px">${LANG==="sr"?SR.MONTHTXT[c.mc[2]]:YEAR[c.mc[2]].split(".")[0].replace("A year","A month")+"."}</p>
    <h3 class="serif" style="color:var(--gold2);font-size:21px;margin-top:14px">${tr("Today","Danas")} · ${c.pd}</h3><p style="line-height:1.6;margin-top:4px">${DAYTXT[c.dc[2]]}</p></div>`;
@@ -1019,8 +1017,7 @@ function kaldSheet(type){
   const vals=nameValues(p.name,p.lang).map(x=>x.v).join("");
   const how=isBK?`${esc(p.name)}<br>${vals} = ${chain(raw)}`:`BK ${r.bk} + ${tr("day","dan")} ${p.d} + ${tr("month","mesec")} ${p.m} + ${tr("year","godina")} ${String(p.y).split("").join(" + ")} = ${chain(raw)}`;
   openSheet(`<h2>${isBK?tr("Character Number (BK)","Broj karaktera (BK)"):tr("Full Personal Expression (PLI)","Pun lični izraz (PLI)")}</h2><p class="lead">${tr("Chaldean Numerology · world table","Chaldean Numerology · svetska tablica")}</p>${star(n,"bignum")}
-   <div class="calc">${how}</div>
-   <p class="mt">${isBK?tr("Your BK shows what your first and last name bring into your life and how they influence it – on their own, without your date of birth.","BK pokazuje šta ime i prezime donose u vaš život i kako na njega utiču – sami po sebi, bez datuma rođenja."):tr("Your PLI is your Character Number plus your full date of birth. It shows your talents and how your name and your birth work together.","PLI je broj karaktera plus ceo datum rođenja. Pokazuje vaše talente i kako ime i rođenje deluju zajedno.")}</p>
+   <p class="mt">${isBK?tr("Your BK shows what your first and last name bring into your life and how they influence it – on their own, without your date of birth.","BK pokazuje šta ime i prezime donose u vaš život i kako na njega utiču – sami po sebi, bez datuma rođenja."):tr("Your PLI shows your talents and how your name and your birth work together.","PLI pokazuje vaše talente i kako ime i rođenje deluju zajedno.")}</p>
    <h3>${tr("Meaning of","Značenje broja")} ${n}</h3><p>${K.s}</p>
    ${has("chaldean")?`<p style="white-space:pre-line;margin-top:10px">${K.l}</p>`:proBtnF("chaldean")}`);
 }
@@ -1030,8 +1027,7 @@ function stepenSheet(){
    <h3 class="center" style="margin-top:0">${tr(`${S[1]} ${S[0]} influence`,`Uticaj: ${S[1]} ${S[0]}`)}</h3>
    <p>${tr(`Every day of birth carries a degree and the influence of a zodiac sign. Besides your own sign, you also take on the qualities of <b>${S[0]}</b>: ${S[2]}.`,`Svaki dan rođenja nosi stepen i uticaj horoskopskog znaka. Pored svog znaka, poprimate i osobine znaka <b>${S[0]}</b>: ${S[2]}.`)}</p>
    <p class="mt">${tr("For example, someone who is an Aries by horoscope but was born on the 10th or 23rd also carries a touch of Aquarius – a futuristic, visionary and creative streak that a classic Aries does not have.","Na primer, neko ko je po horoskopu Ovan, a rođen je 10. ili 23. u mesecu, nosi i malo Vodolije – futuristički momenat, vizije i kreativnost koje klasičan Ovan nema.")}</p>
-   <h3>${tr("Degrees by day of birth","Stepeni po danu rođenja")}</h3>
-   <div class="calc">${STEP_DAYS.map((ds,i)=>`${ds.join(", ")} → ${STEP_DEG[i]} ${SIGNS[i][0]}`).join("<br>")}</div>`);
+`);
 }
 /* Square (kvadrat) essences – short, never the full text */
 let SQ={
@@ -1110,7 +1106,6 @@ function karmaSheet(){
   openSheet(`<h2>${tr("Your Karma","Vaša karma")}</h2><p class="lead">${tr("Read from the squares of your date of birth","Čitano iz kvadrata vašeg datuma rođenja")}</p>
    <div class="codebig" style="font-size:44px;letter-spacing:4px">${dd2} □ ${k.g}</div>
    <p class="center small">${tr("and","i")} ${k.st} □ ${k.g}</p>
-   <div class="calc">${tr(`Square = day of birth (${dd2}) with the generation number (${k.g}), and the degree of that day (${k.st}) with the generation number (${k.g}).`,`Kvadrat = dan rođenja (${dd2}) sa generacijskim brojem (${k.g}), i stepen tog dana (${k.st}) sa generacijskim brojem (${k.g}).`)}</div>
    ${short}
    <h3>${tr("Your squares","Vaši kvadrati")}</h3>
    ${pairs.map(key=>`<div class="combo"><div class="h">${key.replace("-"," □ ")}</div><p>${SQ[key]||""}</p></div>`).join("")}
