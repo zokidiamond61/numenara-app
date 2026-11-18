@@ -1132,7 +1132,7 @@ const SHEETS={
     const sel=sec||"";
     openSheet(`<h2 class="center" style="padding:0">Numenara Pro</h2><p class="lead center">${tr("Unlock only what you want – or everything at once.","Otključajte samo ono što želite – ili sve odjednom.")}</p>
       <div class="plan on" style="text-align:left;padding:18px 16px;margin-bottom:14px"><span class="save">${tr("Best value","Najisplativije")}</span>
-        <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="serif" style="font-size:24px;font-weight:700;color:var(--gold2)">${tr("Complete Pro","Kompletan Pro")}</div><div class="small">${tr("All sections + no ads","Sve sekcije + bez reklama")}</div></div><div class="p" style="margin:0">€29.99</div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="serif" style="font-size:24px;font-weight:700;color:var(--gold2)">${tr("Complete Pro","Kompletan Pro")}</div><div class="small">${tr("All sections + no ads","Sve sekcije + bez reklama")}</div></div><div class="p" style="margin:0">${priceOf("pro")}</div></div>
         <button class="btn gold mt" id="subscribe">${state.pro?tr("✓ Unlocked","✓ Otključano"):tr("Unlock everything","Otključaj sve")}</button></div>
       <h3>${tr("Or unlock a single section","Ili otključajte pojedinačnu sekciju")}</h3>
       ${SECTIONS.map(([id,en,sr,den,dsr])=>{const own=has(id);return `<div class="secbuy ${id===sel?"sel":""}"><div style="flex:1"><b>${tr(en,sr)}</b><div class="small">${tr(den,dsr)}</div></div>${own?`<span class="owned">✓</span>`:`<button class="buy" data-buy="${id}">${priceOf(id)}</button>`}</div>`}).join("")}
@@ -1183,7 +1183,7 @@ const SHEETS={
 };
 function lockSheet(id){
   const T=LANG==="sr"?{karma:["Karma · prošli život","Otkrijte ko ste bili u prošlom životu, kako se taj život završio i koje karmičke lekcije ste došli da iscelite – iz kvadrata datuma rođenja, stepena i cifara dana rođenja."],energy:["Boje, kristali i filmovi","Boje i kamenje zrače energijom – u garderobi, novčaniku i oko vas.\n\nOtkrijte koje boje i kristali vas podržavaju, koju boju iz kvadrata da izbegavate, savete za novčanik – pa čak i koje filmove volite."],home:["Mesto stanovanja","Niko ne treba da živi u svojim kvadratima.\n\nSaznajte koja mesta, spratovi i okruženja vam ne odgovaraju – iz brojeva u kvadratu, sa najvećim akcentom na generacijskom broju."],calendar:["Numerološki kalendar","Vaš kod za svaki dan u mesecu – planirajte važne trenutke u pravo vreme."],synastry:["Kod veze · sinastrija","Saberite svoj Pitagorin kod sa kodom partnera i dobijete kod vaše veze.\n\nSaznajte cilj vaše veze, kako je počela, šta se u njoj dešava i kako se završava – uz opširno tumačenje za svaki od 81 koda."]}[id]:{karma:["Karma · Past Life","Discover who you were in a past life, how that life ended and which karmic lessons you came to heal now – read from the square of your date of birth, your degree and the digits of your birth day."],energy:["Colours, Crystals & Films","Colours and stones radiate energy – in your clothes, your wallet and around you.\n\nDiscover which colours and crystals support you, which colour from your square to avoid, tips for your wallet – and even which films you love."],home:["Where to Live","Nobody should live in their squares.\n\nFind out which places, floors and surroundings don't suit you – read from the numbers in your square, with the strongest accent on your generation number."],calendar:["Numerology Calendar","See your code for every day of the month and plan important moments at the right time."],synastry:["Relationship Code · Synastry","Add your Pythagorean code to your partner's and you get the code of your relationship.\n\nDiscover the goal of your bond, how it began, what happens inside it and how it ends – with a full reading for each of the 81 codes."]}[id];
-  openSheet(`<div class="lockcard" style="margin-top:14px"><div class="art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 18 3-18M6 3l3 6M18 3l-3 6"/></svg></div><div class="in"><h2 style="text-align:center;padding:0">${T[0]}</h2><p style="white-space:pre-line;margin:10px 0 18px">${T[1]}</p><button class="btn violet" data-open="paywall" data-sec="${id}">${GEM.replace('class="gem"','')} ${tr("Unlock","Otključaj")} · ${priceOf(id)}</button><button class="btn ghost mt" data-open="paywall">${tr("All of Pro","Ceo Pro")} · €29.99</button></div></div>`);
+  openSheet(`<div class="lockcard" style="margin-top:14px"><div class="art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 18 3-18M6 3l3 6M18 3l-3 6"/></svg></div><div class="in"><h2 style="text-align:center;padding:0">${T[0]}</h2><p style="white-space:pre-line;margin:10px 0 18px">${T[1]}</p><button class="btn violet" data-open="paywall" data-sec="${id}">${GEM.replace('class="gem"','')} ${tr("Unlock","Otključaj")} · ${priceOf(id)}</button><button class="btn ghost mt" data-open="paywall">${tr("All of Pro","Ceo Pro")} · ${priceOf("pro")}</button></div></div>`);
 }
 
 
@@ -1299,10 +1299,12 @@ async function initAds(){
   if(!isNative()||!AdMob()) return;
   try{
     await AdMob().initialize({initializeForTesting:ADS.testing});
-    const info=await AdMob().requestConsentInfo();                 // Google UMP – consent for EEA/UK users
+  }catch(e){console.warn("ads init",e)}
+  try{                                                             // Google UMP – consent for EEA/UK users (never blocks the banner)
+    const info=await AdMob().requestConsentInfo();
     if(info&&info.isConsentFormAvailable&&info.status==="REQUIRED") await AdMob().showConsentForm();
-    adsReady=true; refreshAds();
-  }catch(e){console.warn("ads",e)}
+  }catch(e){console.warn("consent",e)}
+  adsReady=true; refreshAds();
 }
 async function refreshAds(){
   const want=!state.pro;
