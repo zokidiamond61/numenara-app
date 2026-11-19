@@ -36,4 +36,23 @@ if "suppressUnsupportedCompileSdk" not in p:
     p += "\nandroid.suppressUnsupportedCompileSdk=36\n"
 props.write_text(p)
 
+# 4. Release build: R8 shrinking + obfuscation (Play "DEX code optimisation")
+g = gradle.read_text()
+g = re.sub(r"(release\s*\{[^}]*?)minifyEnabled\s+false", r"\1minifyEnabled true\n            shrinkResources true", g, count=1, flags=re.S)
+g = g.replace("getDefaultProguardFile('proguard-android.txt')", "getDefaultProguardFile('proguard-android-optimize.txt')")
+gradle.write_text(g)
+assert "minifyEnabled true" in g, "could not enable minify"
+rules = pathlib.Path("android/app/proguard-rules.pro")
+rules.write_text(rules.read_text() + "\n" + pathlib.Path("scripts/proguard-rules.pro").read_text())
+
+# 5. Edge-to-edge (Android 15+): dark window behind the system bars
+styles = pathlib.Path("android/app/src/main/res/values/styles.xml")
+st = styles.read_text()
+pathlib.Path("android/app/src/main/res/values/numenara_colors.xml").write_text('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="numenara_bg">#FF120A24</color>\n</resources>\n')
+if "numenara_bg" not in st:
+    st = re.sub(r'(<style name="AppTheme\.NoActionBar"[^>]*>)',
+                r'\1\n        <item name="android:windowBackground">@color/numenara_bg</item>\n        <item name="android:statusBarColor">@color/numenara_bg</item>\n        <item name="android:navigationBarColor">@color/numenara_bg</item>\n        <item name="android:windowLightStatusBar">false</item>',
+                st, count=1)
+styles.write_text(st)
+
 print(f"Configured Android project: versionCode={version_code}, versionName={version_name}")

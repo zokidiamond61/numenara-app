@@ -3,6 +3,7 @@
   "appName": "Numenara",
   "webDir": "www",
   "android": {
-    "backgroundColor": "#120a24"
+    "backgroundColor": "#120a24",
+    "adjustMarginsForEdgeToEdge": "auto"
   }
 }

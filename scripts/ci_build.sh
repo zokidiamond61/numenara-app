@@ -26,3 +26,4 @@ cd ..
 mkdir -p out
 cp android/app/build/outputs/bundle/release/app-release.aab "out/Numenara-${GITHUB_RUN_NUMBER}.aab"
 cp android/app/build/outputs/apk/release/app-release.apk "out/Numenara-${GITHUB_RUN_NUMBER}.apk"
+cp android/app/build/outputs/mapping/release/mapping.txt "out/mapping-${GITHUB_RUN_NUMBER}.txt" 2>/dev/null || true
