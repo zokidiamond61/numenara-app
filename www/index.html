@@ -2998,7 +2998,7 @@ $("#finish").onclick=()=>{
 const ADS={
   appId:"ca-app-pub-3683026843187590~9007009821",          // Numenara AdMob App ID (also goes into AndroidManifest)
   banner:"ca-app-pub-3683026843187590/9579844565",         // "Numenara banner" ad unit
-  testing:true   // keep test ads during closed testing; set false for the production release
+  testing:false  // production: real ads (do not click your own ads)
 };
 const PRIVACY_URL="https://zokidiamond61.github.io/numenara/privacy.html",TERMS_URL="https://zokidiamond61.github.io/numenara/terms.html";
 const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
