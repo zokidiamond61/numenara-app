@@ -3024,8 +3024,8 @@ const ADS={
   banner:"ca-app-pub-3683026843187590/9579844565",         // "Numenara banner" ad unit
   testing:false  // production: real ads (do not click your own ads)
 };
-/* iOS: until the iOS app is added in AdMob, use Google's test banner (replace with the real iOS ad unit later). */
-const ADS_IOS={banner:"ca-app-pub-3940256099942544/2435281174",testing:true};
+/* iOS AdMob: app ca-app-pub-3683026843187590~8891716915, "Numenara iOS banner" ad unit */
+const ADS_IOS={banner:"ca-app-pub-3683026843187590/2346936973",testing:false};
 const adCfg=()=>IS_IOS()?ADS_IOS:ADS;
 const PRIVACY_URL="https://zokidiamond61.github.io/numenara/privacy.html",TERMS_URL="https://zokidiamond61.github.io/numenara/terms.html";
 const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
