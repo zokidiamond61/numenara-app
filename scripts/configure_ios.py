@@ -10,4 +10,11 @@ d["ITSAppUsesNonExemptEncryption"] = False
 d["SKAdNetworkItems"] = [{"SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork"}]
 d["UIRequiresFullScreen"] = True
 p.write_bytes(plistlib.dumps(d))
-print("Info.plist configured")
+# Minimum iOS 15 (Apple requirement from April 2027)
+import re
+pod = pathlib.Path("ios/App/Podfile")
+if pod.exists():
+    pod.write_text(re.sub(r"platform :ios, '[0-9.]+'", "platform :ios, '15.0'", pod.read_text()))
+pbx = pathlib.Path("ios/App/App.xcodeproj/project.pbxproj")
+pbx.write_text(re.sub(r"IPHONEOS_DEPLOYMENT_TARGET = [0-9.]+;", "IPHONEOS_DEPLOYMENT_TARGET = 15.0;", pbx.read_text()))
+print("Info.plist configured, iOS 15.0 minimum")
