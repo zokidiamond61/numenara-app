@@ -1,0 +1,13 @@
+name: iOS setup (App Store Connect)
+on: workflow_dispatch
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    env:
+      ASC_KEY_ID: 84VTLBWZGT
+      ASC_ISSUER_ID: 7802d978-510a-41ef-92ac-0f8c29904f27
+      APPSTORE_P8: ${{ secrets.APPSTORE_P8 }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: pip install pyjwt cryptography
+      - run: python3 scripts/asc_setup.py
