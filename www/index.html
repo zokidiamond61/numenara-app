@@ -2794,7 +2794,7 @@ const SHEETS={
         <button class="btn gold mt" id="subscribe">${state.pro?tr("✓ Active","✓ Aktivno"):tr("Subscribe to everything","Pretplati se na sve")}</button></div>
       <h3>${tr("Or subscribe to a single section","Ili se pretplatite na jednu sekciju")}</h3>
       ${SECTIONS.map(([id,en,sr,den,dsr])=>{const own=has(id);return `<div class="secbuy ${id===sel?"sel":""}"><div style="flex:1"><b>${tr(en,sr)}</b><div class="small">${tr(den,dsr)}</div></div>${own?`<span class="owned">✓</span>`:`<button class="buy" data-buy="${id}">${priceOf(id)}<span style="display:block;font-size:10.5px;font-weight:500;opacity:.8">${tr("/ month","/ mesec")}</span></button>`}</div>`}).join("")}
-      <p class="fine">${tr("Subscriptions renew automatically – sections every month, Complete Pro every 3 months – until you cancel. You can cancel anytime in Google Play → Subscriptions; access stays until the end of the paid period. Payment is charged to your Google Play account. Basic numbers stay free.","Pretplate se obnavljaju automatski – sekcije svakog meseca, Kompletan Pro na svaka 3 meseca – dok ih ne otkažete. Otkazati možete bilo kada u Google Play → Pretplate; pristup ostaje do kraja plaćenog perioda. Plaćanje se naplaćuje preko Google Play naloga. Osnovni brojevi ostaju besplatni.")}</p>
+      <p class="fine">${IS_IOS()?tr("Subscriptions renew automatically – sections every month, Complete Pro every 3 months – unless cancelled at least 24 hours before the end of the current period. Payment is charged to your Apple ID at confirmation of purchase. Manage or cancel anytime in Settings → your name → Subscriptions; access stays until the end of the paid period. Basic numbers stay free.","Pretplate se automatski obnavljaju – sekcije svakog meseca, Kompletan Pro na svaka 3 meseca – osim ako ih ne otkažete najmanje 24 sata pre isteka tekućeg perioda. Plaćanje se naplaćuje preko Apple ID-a pri potvrdi kupovine. Upravljajte ili otkažite bilo kada u Podešavanja → vaše ime → Pretplate; pristup ostaje do kraja plaćenog perioda. Osnovni brojevi ostaju besplatni."):tr("Subscriptions renew automatically – sections every month, Complete Pro every 3 months – until you cancel. You can cancel anytime in Google Play → Subscriptions; access stays until the end of the paid period. Payment is charged to your Google Play account. Basic numbers stay free.","Pretplate se obnavljaju automatski – sekcije svakog meseca, Kompletan Pro na svaka 3 meseca – dok ih ne otkažete. Otkazati možete bilo kada u Google Play → Pretplate; pristup ostaje do kraja plaćenog perioda. Plaćanje se naplaćuje preko Google Play naloga. Osnovni brojevi ostaju besplatni.")}</p>
       <button class="btn ghost" id="restore">${tr("Restore purchases","Vrati kupovine")}</button><button class="btn ghost" id="manageSubs" style="margin-top:8px">${tr("Manage subscriptions","Upravljaj pretplatama")}</button><button class="btn ghost" id="giftBtn" style="margin-top:8px">🎁 ${tr("Have a gift code?","Imate poklon kod?")}</button>
       <div class="links"><a href="${PRIVACY_URL}" target="_blank" rel="noopener">${tr("Privacy Policy","Politika privatnosti")}</a><a href="${TERMS_URL}${LANG==='sr'?'#sr':''}" target="_blank" rel="noopener">${tr("Terms of Use","Uslovi korišćenja")}</a></div>`);
     if(sel){const el=document.querySelector(".secbuy.sel");el&&el.scrollIntoView({block:"center"})}
@@ -2864,7 +2864,9 @@ function lockSheet(id){
    In the browser preview purchases stay in test mode. */
 const PRODUCTS={karma:"sub_karma",chaldean:"sub_chaldean",energy:"sub_energy",home:"sub_home",calendar:"sub_calendar",synastry:"sub_synastry",pro:"sub_pro"};
 const LEGACY={karma:"numenara_karma",chaldean:"numenara_chaldean",energy:"numenara_energy",home:"numenara_home",calendar:"numenara_calendar",synastry:"numenara_synastry",pro:"numenara_pro_complete"};
-const billingOn=()=>isNative()&&!!window.CdvPurchase;
+const IS_IOS=()=>!!(window.Capacitor&&window.Capacitor.getPlatform&&window.Capacitor.getPlatform()==="ios");
+const STORE=()=>IS_IOS()?"App Store":"Google Play";
+const billingOn=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())&&!!window.CdvPurchase;
 let storeReady=false;
 function priceOf(sec){try{if(billingOn()){const p=CdvPurchase.store.get(PRODUCTS[sec]);const pr=p&&p.pricing&&p.pricing.price;if(pr)return pr}}catch(e){}return sec==="pro"?"€59.99":"€9.99"}
 function grant(sec){if(sec==="pro"){state.pro=true}else{state.unl=[...new Set([...(state.unl||[]),sec])]}save();render();if(typeof refreshAds==="function")refreshAds()}
@@ -2899,14 +2901,15 @@ function restorePurchases(){
 }
 function manageSubscriptions(){
   if(billingOn()&&CdvPurchase.store.manageSubscriptions){CdvPurchase.store.manageSubscriptions();return}
-  window.open("https://play.google.com/store/account/subscriptions","_blank");
+  window.open(IS_IOS()?"https://apps.apple.com/account/subscriptions":"https://play.google.com/store/account/subscriptions","_blank");
 }
 function initBilling(){
   if(!billingOn())return;
   const {store,ProductType,Platform}=CdvPurchase;
+  const PF=IS_IOS()?Platform.APPLE_APPSTORE:Platform.GOOGLE_PLAY;
   store.register([
-    ...Object.values(PRODUCTS).map(id=>({id,type:ProductType.PAID_SUBSCRIPTION,platform:Platform.GOOGLE_PLAY})),
-    ...Object.values(LEGACY).map(id=>({id,type:ProductType.NON_CONSUMABLE,platform:Platform.GOOGLE_PLAY}))
+    ...Object.values(PRODUCTS).map(id=>({id,type:ProductType.PAID_SUBSCRIPTION,platform:PF})),
+    ...(IS_IOS()?[]:Object.values(LEGACY).map(id=>({id,type:ProductType.NON_CONSUMABLE,platform:PF})))
   ]);
   store.when()
     .approved(tx=>tx.verify())
@@ -2914,7 +2917,7 @@ function initBilling(){
     .finished(tx=>{applyOwned();if(pendingBuy){const sec=pendingBuy;pendingBuy=null;toast(tr("✦ Thank you! Your subscription is active.","✦ Hvala! Vaša pretplata je aktivna."));if(sec!=="pro")afterUnlock(sec);else closeSheet()}})
     .productUpdated(()=>applyOwned())
     .receiptUpdated(()=>applyOwned());
-  store.initialize([Platform.GOOGLE_PLAY]).then(()=>{storeReady=true;applyOwned()});
+  store.initialize([PF]).then(()=>{storeReady=true;applyOwned()});
 }
 document.addEventListener("deviceready",initBilling,false);
 
@@ -3000,6 +3003,9 @@ const ADS={
   banner:"ca-app-pub-3683026843187590/9579844565",         // "Numenara banner" ad unit
   testing:false  // production: real ads (do not click your own ads)
 };
+/* iOS: until the iOS app is added in AdMob, use Google's test banner (replace with the real iOS ad unit later). */
+const ADS_IOS={banner:"ca-app-pub-3940256099942544/2435281174",testing:true};
+const adCfg=()=>IS_IOS()?ADS_IOS:ADS;
 const PRIVACY_URL="https://zokidiamond61.github.io/numenara/privacy.html",TERMS_URL="https://zokidiamond61.github.io/numenara/terms.html";
 const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const AdMob=()=>window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.AdMob;
@@ -3007,7 +3013,7 @@ let adsReady=false, adShown=null;
 async function initAds(){
   if(!isNative()||!AdMob()) return;
   try{
-    await AdMob().initialize({initializeForTesting:ADS.testing});
+    await AdMob().initialize({initializeForTesting:adCfg().testing,requestTrackingAuthorization:IS_IOS()});
   }catch(e){console.warn("ads init",e)}
   try{                                                             // Google UMP – consent for EEA/UK users (never blocks the banner)
     const info=await AdMob().requestConsentInfo();
@@ -3020,7 +3026,7 @@ async function refreshAds(){
   document.body.classList.toggle("native",isNative());
   if(!adsReady||adShown===want) return;
   try{
-    if(want) await AdMob().showBanner({adId:ADS.banner,adSize:"ADAPTIVE_BANNER",position:"BOTTOM_CENTER",margin:0,isTesting:ADS.testing});
+    if(want) await AdMob().showBanner({adId:adCfg().banner,adSize:"ADAPTIVE_BANNER",position:"BOTTOM_CENTER",margin:0,isTesting:adCfg().testing});
     else await AdMob().removeBanner();
     adShown=want;
   }catch(e){console.warn("banner",e)}
