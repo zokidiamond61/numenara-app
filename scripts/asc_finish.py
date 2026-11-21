@@ -53,4 +53,13 @@ for sub in [x for x in r.get("included", []) if x["type"] == "subscriptions"]:
     s, r2 = call("PATCH", f"/v1/subscriptionAppStoreReviewScreenshots/{shot['id']}", {"data": {"type": "subscriptionAppStoreReviewScreenshots", "id": shot["id"],
         "attributes": {"uploaded": True, "sourceFileChecksum": hashlib.md5(data).hexdigest()}}})
     show(s, r2, "review screenshot " + sub["attributes"]["productId"])
+# 4. release automatically after approval
+s, r = call("PATCH", f"/v1/appStoreVersions/{vid}", {"data": {"type": "appStoreVersions", "id": vid, "attributes": {"releaseType": "AFTER_APPROVAL"}}})
+show(s, r, "release type AFTER_APPROVAL")
+s, r = call("GET", f"/v1/appStoreVersions/{vid}?include=build")
+print("version state:", r["data"]["attributes"].get("appStoreState"), r["data"]["attributes"].get("releaseType"),
+      "build:", [x["attributes"]["version"] for x in r.get("included", [])])
+s, r = call("GET", f"/v1/apps/{APP}/subscriptionGroups?include=subscriptions&limit=50")
+for sub in [x for x in r.get("included", []) if x["type"] == "subscriptions"]:
+    print("sub", sub["attributes"]["productId"], sub["attributes"].get("state"))
 print("done")
