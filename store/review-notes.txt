@@ -1,4 +1,5 @@
-SCREEN RECORDING: attached in the Attachment field (recorded on iPhone, latest iOS, TestFlight build of this version). It starts with launching the app and shows onboarding, the free numbers, daily content, a Pro section, the subscription screen with a sandbox purchase, Restore and Manage subscriptions.
+SCREEN RECORDING (on iPhone, latest iOS, TestFlight build of this version): https://drive.google.com/drive/folders/1JBW4vuwHk3WYX8IGenJq7CMJz4NUS6iQ?usp=sharing
+It starts with launching the app and shows onboarding, the free numbers, daily content, a Pro section, the subscription screen with a sandbox purchase, Restore and Manage subscriptions.
 
 1. PURPOSE AND AUDIENCE
 Numenara is a numerology app by numerologist Nan Numero (Barbara Tot, the account holder). From a name and date of birth it calculates a personal numerology profile (Pythagorean system and Chaldean Numerology) and explains each number in plain language. It helps adults interested in numerology and self-reflection understand their character, strengths and life cycles, and gives new daily wisdom, advice and a ritual every day. Audience: adults (13+) who speak English or Serbian. The app is for self-reflection and entertainment; it gives no medical, legal or financial advice.
