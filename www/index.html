@@ -290,6 +290,8 @@ body:not(.pro) .overlay{padding-bottom:calc(env(safe-area-inset-bottom) + 104px)
  .onb [data-step="1"] #finish{min-height:52px}
 }
 /* solid strip behind the native ad banner (covers page under/below it) */
+#swipeHint{position:fixed;left:0;top:50%;width:44px;height:44px;border-radius:50%;background:rgba(36,18,74,.92);border:1px solid var(--gold);color:var(--gold2);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;transform:translateX(-20px);pointer-events:none;transition:opacity .15s}
+#swipeHint svg{width:22px;height:22px}
 #adstrip{display:none;position:fixed;left:0;right:0;bottom:0;height:calc(env(safe-area-inset-bottom) + 64px);background:#0d0718;z-index:95;pointer-events:none}
 body.native:not(.pro) #adstrip{display:block}
 .textlink{color:var(--gold2);text-align:center;margin-top:16px;font-size:14px;text-decoration:underline;text-underline-offset:3px}
@@ -3333,6 +3335,26 @@ applyLang();
 initAds();
 if(!state.profiles.length) startOnboarding(false); else render();
 </script>
-<script>try{document.getElementById("cyear").textContent=new Date().getFullYear()}catch(e){}</script>
+<script>try{document.getElementById("cyear").textContent=new Date().getFullYear()}catch(e){}/* ===== Back navigation: iOS edge swipe + Android back button ===== */
+function goBack(){
+  const dr=$("#drawer"); if(dr.classList.contains("on")){dr.classList.remove("on");return true}
+  if($("#overlay").classList.contains("on")){sheetBack();return true}
+  if($("#onb").classList.contains("on")){const b=document.querySelector("#onb .step.on [data-back-step]"); if(b){b.click();return true} return false}
+  const t=document.querySelector('.tab.on'); if(t && t.dataset.tab!=="numbers"){document.querySelector('.tab[data-tab="numbers"]').click();return true}
+  return false;
+}
+(function(){
+  const hint=document.createElement("div");hint.id="swipeHint";hint.innerHTML=BACK;document.body.appendChild(hint);
+  let sx=0,sy=0,on=false,dx=0;
+  addEventListener("touchstart",e=>{const p=e.touches[0];on=e.touches.length===1&&p.clientX<28;sx=p.clientX;sy=p.clientY;dx=0},{passive:true});
+  addEventListener("touchmove",e=>{if(!on)return;const p=e.touches[0];dx=p.clientX-sx;const dy=Math.abs(p.clientY-sy);
+    if(dy>60&&dy>dx){on=false;hint.style.opacity=0;return}
+    const k=Math.max(0,Math.min(1,dx/90));hint.style.opacity=k;hint.style.top=(p.clientY-22)+"px";hint.style.transform=`translateX(${k*30-20}px)`},{passive:true});
+  const end=()=>{if(on&&dx>80)goBack();on=false;hint.style.opacity=0;hint.style.transform="translateX(-20px)"};
+  addEventListener("touchend",end,{passive:true});addEventListener("touchcancel",()=>{on=false;hint.style.opacity=0},{passive:true});
+  try{const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;
+    if(A&&A.addListener)A.addListener("backButton",()=>{if(!goBack())A.exitApp()})}catch(e){}
+})();
+</script>
 </body>
 </html>
