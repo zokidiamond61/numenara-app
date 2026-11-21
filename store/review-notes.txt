@@ -1,0 +1,26 @@
+SCREEN RECORDING: attached in the Attachment field (recorded on iPhone, latest iOS, TestFlight build of this version). It starts with launching the app and shows onboarding, the free numbers, daily content, a Pro section, the subscription screen with a sandbox purchase, Restore and Manage subscriptions.
+
+1. PURPOSE AND AUDIENCE
+Numenara is a numerology app by numerologist Nan Numero (Barbara Tot, the account holder). From a name and date of birth it calculates a personal numerology profile (Pythagorean system and Chaldean Numerology) and explains each number in plain language. It helps adults interested in numerology and self-reflection understand their character, strengths and life cycles, and gives new daily wisdom, advice and a ritual every day. Audience: adults (13+) who speak English or Serbian. The app is for self-reflection and entertainment; it gives no medical, legal or financial advice.
+
+2. HOW TO USE / ACCESS FEATURES
+No account, login or registration exists. All data is stored only on the device.
+- Launch the app, tap Begin, enter any first name, last name and birth date (time is optional), tap Reveal.
+- Free: My numbers tab (core numbers, tap any number for its meaning), Cycles tab, Daily tab.
+- Paid: menu (top left) lists Pro sections (Karma, Energy, Home numerology, Chaldean details, Calendar, Synastry). Opening one shows the subscription screen with auto-renewable subscriptions: each section 9.99 USD / month, Complete Pro (everything, no ads) 59.99 USD / 3 months. Restore purchases and Manage subscriptions are on the same screen; Terms of Use and Privacy Policy are linked there.
+- To review all Pro content without purchasing: open the side menu (top left), tap "Gift code" and enter NN-U58QEB (also available as "Have a gift code?" on the subscription screen). This unlocks Complete Pro on this device.
+- Language: flag switch (top right) changes between English and Serbian.
+
+3. EXTERNAL SERVICES
+- Apple In-App Purchase (StoreKit) for subscriptions.
+- Google AdMob for banner ads in the free version (with Google's consent form where required and Apple's App Tracking Transparency prompt).
+- Privacy Policy and Terms of Use are hosted on GitHub Pages.
+No backend server, no user accounts, no AI services, no external data providers. All calculations run locally in the app.
+
+4. REGIONAL DIFFERENCES
+The app works the same in all regions where it is available (China mainland is excluded from distribution). Only the ads may differ by region, and users in the EEA/UK see the consent form before personalized ads.
+
+5. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+Not a regulated industry. All texts were written for this app based on the method of numerologist Nan Numero, the owner of the app and of the developer account. No third-party protected material is used.
+
+Contact: nan.numero@gmail.com
