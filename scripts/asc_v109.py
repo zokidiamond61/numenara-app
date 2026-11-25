@@ -10,7 +10,7 @@ def show(s, r, what): print(what, s, "" if s < 300 else json.dumps(r.get("errors
 SUBMIT = len(sys.argv) > 1 and sys.argv[1] == "submit"
 EN_DESC = open("store/ios-description.txt").read().strip()
 HR_DESC = open("store/ios-description-hr.txt").read().strip()
-HR_KW = "numerologija,brojevi,karma,sudbina,horoskop,astrologija,kompatibilnost,ljubav,kristali,ime,datum rođenja"
+HR_KW = "numerologija,brojevi,karma,sudbina,horoskop,astrologija,kompatibilnost,ljubav,kristali,ime,rođenje"
 EN_KW = "numerology,life path,karma,chaldean,name number,synastry,compatibility,crystals,astrology,horoscope"
 assert len(HR_KW) <= 100, len(HR_KW)
 WN_EN = "Improved first screen, swipe back gesture and small fixes."
