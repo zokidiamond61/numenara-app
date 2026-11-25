@@ -31,7 +31,7 @@ jobs:
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Release \
             -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/App.xcarchive" archive \
             DEVELOPMENT_TEAM=$TEAM_ID \
-            MARKETING_VERSION=1.0.7 CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            MARKETING_VERSION=1.0.9 CURRENT_PROJECT_VERSION=${{ github.run_number }} \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | tail -60
           test -d "$RUNNER_TEMP/App.xcarchive"
       - name: Export and upload to App Store Connect (TestFlight)
