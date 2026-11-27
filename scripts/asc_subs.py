@@ -12,6 +12,8 @@ SUBS = [
  ("sub_calendar","Numerology Calendar","ONE_MONTH","9.99","Your energy code for every day"),
  ("sub_synastry","Synastry","ONE_MONTH","9.99","Compatibility of two people"),
  ("sub_pro","Complete Pro","THREE_MONTHS","59.99","All Pro sections, no ads"),
+ ("sub_elements","Four Elements","ONE_MONTH","9.99","Full analysis of your four elements"),
+ ("sub_potentials","Potentials","ONE_MONTH","9.99","Your trigons and sextiles in depth"),
 ]
 def ok(s, r, what):
     if s >= 300:
@@ -72,4 +74,28 @@ for pid, name, period, usd, desc in SUBS:
         if s < 300: n += 1
         elif n == 0: ok(s, r, "price " + pid)
     print(pid, "prices set:", n, "/", len(pts))
+# review screenshot for subscriptions that have none
+import hashlib, urllib.request
+def upload(ops, data):
+    for op in ops:
+        req = urllib.request.Request(op["url"], data=data[op["offset"]:op["offset"]+op["length"]], method=op["method"],
+                                     headers={h["name"]: h["value"] for h in op["requestHeaders"]})
+        urllib.request.urlopen(req).read()
+data = open("store/review-paywall-v2.png", "rb").read()
+s, r = call("GET", f"/v1/apps/{APP}/subscriptionGroups?include=subscriptions&limit=50")
+for sub in [x for x in r.get("included", []) if x["type"] == "subscriptions"]:
+    sid = sub["id"]; pid = sub["attributes"]["productId"]
+    s, r2 = call("GET", f"/v1/subscriptions/{sid}/appStoreReviewScreenshot")
+    if s < 300 and r2.get("data"): continue
+    s, r2 = call("POST", "/v1/subscriptionAppStoreReviewScreenshots", {"data": {"type": "subscriptionAppStoreReviewScreenshots",
+        "attributes": {"fileName": "paywall.png", "fileSize": len(data)},
+        "relationships": {"subscription": {"data": {"type": "subscriptions", "id": sid}}}}})
+    if not ok(s, r2, "reserve shot " + pid): continue
+    shot = r2["data"]; upload(shot["attributes"]["uploadOperations"], data)
+    s, r2 = call("PATCH", f"/v1/subscriptionAppStoreReviewScreenshots/{shot['id']}", {"data": {"type": "subscriptionAppStoreReviewScreenshots", "id": shot["id"],
+        "attributes": {"uploaded": True, "sourceFileChecksum": hashlib.md5(data).hexdigest()}}})
+    print(pid, "screenshot", s)
+s, r = call("GET", f"/v1/apps/{APP}/subscriptionGroups?include=subscriptions&limit=50")
+for sub in [x for x in r.get("included", []) if x["type"] == "subscriptions"]:
+    print("sub", sub["attributes"]["productId"], sub["attributes"].get("state"))
 print("done")

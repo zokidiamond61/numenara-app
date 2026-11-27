@@ -4,7 +4,7 @@ import os, re, pathlib
 ADMOB_APP_ID = "ca-app-pub-3683026843187590~9007009821"
 run = int(os.environ.get("GITHUB_RUN_NUMBER", "1"))
 version_code = run
-version_name = os.environ.get("VERSION_NAME", "1.0.7")  # visible version; versionCode still grows every build
+version_name = os.environ.get("VERSION_NAME", "1.1.1")  # visible version; versionCode still grows every build
 
 # 1. AdMob App ID in the manifest (required by the Google Mobile Ads SDK)
 man = pathlib.Path("android/app/src/main/AndroidManifest.xml")
